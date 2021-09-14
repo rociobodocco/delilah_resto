@@ -1,17 +1,18 @@
 const express = require("express");
-const app = express();
 const { orders, products, users, rol } = require("./src/models");
-const jwt = require("jsonwebtoken");
 const expressJwt = require("express-jwt");
+const jwt = require("jsonwebtoken");
 
 // RANDOM CRYPTO CODE:
-const secretJwt = "reofw97430294mf38409ofmvojrn09291340r19i2nefu";
+const secretJwt = process.env.SECRET_TOKEN;
 
 // PORT
 const APP_PORT = process.env.APP_PORT || 5000;
 
+const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   expressJwt({
@@ -21,6 +22,30 @@ app.use(
 );
 
 // MIDDLEWARES:
+function jwtMiddleware(req, res, next) {
+  const headerAuth = req.headers["authorization"];
+  if (!headerAuth) {
+    return res.status("401").json({ message: "Token is missing!" });
+  }
+  const [, token] = headerAuth.split(" ");
+  try {
+    const tokenDecoded = jwt.verify(token, secretJwt);
+    req.user = tokenDecoded.user;
+  } catch (error) {
+    let message;
+    switch (error.name) {
+      case "JsonWebTokenError":
+        message = "Error in the JWT";
+        break;
+      default:
+        message = "Error";
+        break;
+    }
+    return res.status(401).json({ message });
+  }
+  return next();
+}
+
 function validateProductExist(req, res, next) {
   products
     .findByPk(req.params.id)
@@ -38,10 +63,19 @@ function validateProductExist(req, res, next) {
 }
 
 function validateAdmin(req, res, next) {
-  if (req.usersData.username.rol.name == "administrator") {
-    next();
+  const token = req.headers.authorization.split(" ")[1];
+
+  if (!token) {
+    res.status(401).json({ Error: "Token Invalido" });
   } else {
-    res.status(401).json({ error: "usuario no es administrador" });
+    const verify = jwt.verify(token, secretJwt);
+    console.log(verify)
+
+    if (verify.user.rol.id == 3) {
+      next();
+    } else {
+      res.status(401).json({ Error: "Token Invalido" });
+    }
   }
 }
 
@@ -65,7 +99,7 @@ function validateUserExist(req, res, next) {
 
 //USERS:
 //REGISTER:
-app.post("/register", validateUserExist, async (req, res) => {
+app.post("/register", jwtMiddleware, validateUserExist, async (req, res) => {
   const { username, name, lastname, phone, adress, password, email } = req.body;
 
   const newUser = users.build({
@@ -96,43 +130,44 @@ app.post("/login", async (req, res) => {
     },
     include: [{ model: rol }],
   });
-  
-  try {
-    if (!username || !password) {
-      res.status(404).json({ error: "faltan datos por ingresar" });
-    } else {
-      const token = jwt.sign(
-        {
-          user,
-        },
-        secretJwt,
-        { expiresIn: "60m" }
-      );
-      res.json(token);
-    } 
-  } catch (e) {
-    res.status(401).json({ error: "Usuario o Contrasena incorrecta, ingrese sus datos nuevamente" });
+
+  if (!user) {
+    return res.status(401).json({
+      status: 401,
+      error: "usuario y/o contraña incorrecto",
+    });
   }
-    
-  
-});
+  const token = jwt.sign(
+    {
+      user,
+    },
+    secretJwt,
+    { expiresIn: "60m" }
+  );
+
+  return res.json({ token });
+}); //ok
 
 app.get("/users", validateAdmin, async (req, res) => {
   try {
-    res.status(200).json(
-      await users.findAll({
-        include: [{ model: users }],
-      })
-    );
-  } catch (e) {
-    res.status(500).json({ error: e.message });
+    const usersData = await users.findAll({
+      attributes: {
+        exclude: ["rol_id"],
+      },
+      include: ["rol"],
+    });
+    return res.json({
+      status: 200,
+      data: usersData,
+    });
+  } catch (error) {
+    return next({ message: "Internal server error" });
   }
 });
 
-app.get("/users/:id", validateAdmin, async (req, res) => {
+app.get("/users/:id", jwtMiddleware, validateAdmin, async (req, res) => {
   try {
-    if(user)
-    res.status(200).json(await users.findByPk(req.params.username));
+    if (user) res.status(200).json(await users.findByPk(req.params.username));
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -140,7 +175,7 @@ app.get("/users/:id", validateAdmin, async (req, res) => {
 
 // ----------
 // PRODUCTS:
-app.get("/products", async (req, res) => {
+app.get("/products", jwtMiddleware, async (req, res) => {
   try {
     res.status(200).json(
       await products.findAll({
@@ -152,7 +187,7 @@ app.get("/products", async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-});
+}); //ok
 
 app.get("/products/:id", async (req, res) => {
   try {
@@ -160,21 +195,32 @@ app.get("/products/:id", async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-});
+}); //ok
 
-app.post("/products", validateProductExist, validateAdmin, async (req, res) => {
-  const { name, price, active, image } = req.body;
+app.post(
+  "/products",
+  jwtMiddleware,
+  validateProductExist,
+  validateAdmin,
+  async (req, res) => {
+    const { name, price, active, image } = req.body;
 
-  const newProduct = products.build({ name, price, active, image });
+    const newProduct = products.build({ name, price, active, image });
 
-  try {
-    res.status(201).json(await newProduct.save());
-  } catch (e) {
-    res.status(400).json({ error: e.message });
+    try {
+      res.status(201).json(await newProduct.save());
+    } catch (e) {
+      res.status(400).json({ error: e.message });
+    }
   }
-});
+);
 
-app.put("/products/:id", validateProductExist, validateAdmin, async (req, res) => {
+app.put(
+  "/products/:id",
+  jwtMiddleware,
+  validateProductExist,
+  validateAdmin,
+  async (req, res) => {
     try {
       res.status(200).json(await req.productsData.update(req.body));
     } catch (e) {
@@ -183,7 +229,12 @@ app.put("/products/:id", validateProductExist, validateAdmin, async (req, res) =
   }
 );
 
-app.delete("/products/:id", validateProductExist, validateAdmin, async (req, res) => {
+app.delete(
+  "/products/:id",
+  jwtMiddleware,
+  validateProductExist,
+  validateAdmin,
+  async (req, res) => {
     try {
       res.status(200).json(await req.productsData.update({ active: false }));
     } catch (e) {
@@ -194,7 +245,7 @@ app.delete("/products/:id", validateProductExist, validateAdmin, async (req, res
 
 // ----------
 // ORDERS:
-app.get("/orders", validateAdmin, async (req, res) => {
+app.get("/orders", jwtMiddleware, validateAdmin, async (req, res) => {
   try {
     res.status(200).json(
       await orders.findAll({
@@ -206,7 +257,7 @@ app.get("/orders", validateAdmin, async (req, res) => {
   }
 });
 
-app.get("/orders/:id", async (req, res) => {
+app.get("/orders/:id", jwtMiddleware, async (req, res) => {
   try {
     res.status(200).json(
       await orders.findByPk(req.params.id, {
@@ -216,10 +267,9 @@ app.get("/orders/:id", async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-  
 });
 
-app.post("/orders", validateProductExist, async (req, res) => {
+app.post("/orders", jwtMiddleware, validateProductExist, async (req, res) => {
   const { total_price, date, state, payoptions_id, users_id } = req.body;
 
   const newOrder = orders.build({
@@ -237,7 +287,7 @@ app.post("/orders", validateProductExist, async (req, res) => {
   }
 });
 
-app.put("/orders/:id", validateAdmin, async (req, res) => {
+app.put("/orders/:id", jwtMiddleware, validateAdmin, async (req, res) => {
   try {
     res.status(200).json(await req.ordersData.update(req.body));
   } catch (e) {
@@ -245,14 +295,13 @@ app.put("/orders/:id", validateAdmin, async (req, res) => {
   }
 });
 
-app.delete("/orders/:id", validateAdmin, async (req, res) => {
+app.delete("/orders/:id", jwtMiddleware, validateAdmin, async (req, res) => {
   try {
     res.status(200).json(await req.ordersData.update({ state: "cancelado" }));
   } catch (e) {
     res.status(400).json({ error: e.message });
   }
 });
-
 
 // PORT:
 app.listen(APP_PORT, () => {
