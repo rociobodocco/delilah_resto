@@ -8,7 +8,7 @@ const orders = sequelize.define('orders', {
         allowNull:false
     },
     state: {
-        type: DataTypes.ENUM(['nuevo', 'confirmado','finalizado']),
+        type: DataTypes.ENUM(['nuevo', 'confirmado','finalizado', 'cancelado']),
         allowNull:false
     },
     date: {

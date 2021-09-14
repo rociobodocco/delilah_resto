@@ -10,6 +10,7 @@ const secretJwt = "reofw97430294mf38409ofmvojrn09291340r19i2nefu";
 // PORT
 const APP_PORT = process.env.APP_PORT || 5000;
 
+
 app.use(express.json());
 
 app.use(
@@ -37,10 +38,10 @@ function validateProductExist(req, res, next) {
 }
 
 function validateAdmin(req, res, next) {
-  if (req.usersData.username.rol.name == "admin") {
+  if (req.usersData.username.rol.name == "administrator") {
     next();
   } else {
-    res.status(401).json({ error: "usuario no es admin" });
+    res.status(401).json({ error: "usuario no es administrador" });
   }
 }
 
@@ -62,32 +63,8 @@ function validateUserExist(req, res, next) {
 
 // ENDPOINTS:
 
-// LOGUIN:
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  const user = await users.findOne({
-    attributes: ["id", "email", "name"],
-    where: {
-      username,
-      password,
-    },
-    include: [{ model: rol }],
-  });
-
-  if (user == null) {
-    res.status(401).json({ error: "username o contrasena incorrecta" });
-  } else {
-    const token = jwt.sign(
-      {
-        user,
-      },
-      secretJwt,
-      { expiresIn: "60m" }
-    );
-    res.json(token);
-  }
-});
-
+//USERS:
+//REGISTER:
 app.post("/register", validateUserExist, async (req, res) => {
   const { username, name, lastname, phone, adress, password, email } = req.body;
 
@@ -104,23 +81,85 @@ app.post("/register", validateUserExist, async (req, res) => {
   try {
     res.status(201).json(await newUser.save());
   } catch (e) {
-    res.status(400).json({ error: e.message });
+    res.status(401).json({ error: e.message });
   }
 });
 
+// LOGUIN:
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  const user = await users.findOne({
+    attributes: ["id", "email", "name"],
+    where: {
+      username,
+      password,
+    },
+    include: [{ model: rol }],
+  });
+  
+  try {
+    if (!username || !password) {
+      res.status(404).json({ error: "faltan datos por ingresar" });
+    } else {
+      const token = jwt.sign(
+        {
+          user,
+        },
+        secretJwt,
+        { expiresIn: "60m" }
+      );
+      res.json(token);
+    } 
+  } catch (e) {
+    res.status(401).json({ error: "Usuario o Contrasena incorrecta, ingrese sus datos nuevamente" });
+  }
+    
+  
+});
+
+app.get("/users", validateAdmin, async (req, res) => {
+  try {
+    res.status(200).json(
+      await users.findAll({
+        include: [{ model: users }],
+      })
+    );
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get("/users/:id", validateAdmin, async (req, res) => {
+  try {
+    if(user)
+    res.status(200).json(await users.findByPk(req.params.username));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ----------
 // PRODUCTS:
 app.get("/products", async (req, res) => {
-  res.status(200).json(
-    await products.findAll({
-      where: {
-        active: true,
-      },
-    })
-  );
+  try {
+    res.status(200).json(
+      await products.findAll({
+        where: {
+          active: true,
+        },
+      })
+    );
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.get("/products/:id", async (req, res) => {
-  res.status(200).json(await products.findByPk(req.params.id));
+  try {
+    res.status(200).json(await products.findByPk(req.params.id));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.post("/products", validateProductExist, validateAdmin, async (req, res) => {
@@ -135,11 +174,7 @@ app.post("/products", validateProductExist, validateAdmin, async (req, res) => {
   }
 });
 
-app.put(
-  "/products/:id",
-  validateProductExist,
-  validateAdmin,
-  async (req, res) => {
+app.put("/products/:id", validateProductExist, validateAdmin, async (req, res) => {
     try {
       res.status(200).json(await req.productsData.update(req.body));
     } catch (e) {
@@ -148,11 +183,7 @@ app.put(
   }
 );
 
-app.delete(
-  "/products/:id",
-  validateProductExist,
-  validateAdmin,
-  async (req, res) => {
+app.delete("/products/:id", validateProductExist, validateAdmin, async (req, res) => {
     try {
       res.status(200).json(await req.productsData.update({ active: false }));
     } catch (e) {
@@ -161,21 +192,31 @@ app.delete(
   }
 );
 
+// ----------
 // ORDERS:
 app.get("/orders", validateAdmin, async (req, res) => {
-  res.status(200).json(
-    await orders.findAll({
-      include: [{ model: products }, { model: users }],
-    })
-  );
+  try {
+    res.status(200).json(
+      await orders.findAll({
+        include: [{ model: products }, { model: users }],
+      })
+    );
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.get("/orders/:id", async (req, res) => {
-  res.status(200).json(
-    await orders.findByPk(req.params.id, {
-      include: [{ model: products }, { model: users }],
-    })
-  );
+  try {
+    res.status(200).json(
+      await orders.findByPk(req.params.id, {
+        include: [{ model: products }, { model: users }],
+      })
+    );
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+  
 });
 
 app.post("/orders", validateProductExist, async (req, res) => {
@@ -211,6 +252,7 @@ app.delete("/orders/:id", validateAdmin, async (req, res) => {
     res.status(400).json({ error: e.message });
   }
 });
+
 
 // PORT:
 app.listen(APP_PORT, () => {

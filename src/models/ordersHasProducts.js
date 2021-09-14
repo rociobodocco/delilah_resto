@@ -4,7 +4,7 @@ const orders = require('./orders');
 const products = require('./products');
 
 const ordersHasProducts = sequelize.define('orders_has_products', {
-    cuantity: { 
+    quantity: { 
         type: DataTypes.INTEGER,
         allowNull:false
     },

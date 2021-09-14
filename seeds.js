@@ -1,4 +1,30 @@
-const { orders, products, users, ordersHasProducts } = require("./src/models");
+const { orders, products, users, ordersHasProducts, payOptions, rol } = require("./src/models");
+
+// Roles
+const roleData = [
+  {
+    name: "administrator"
+  },
+  {
+    name: "customer"
+  },
+];
+
+// Payment Options
+const paymentOptionsData = [
+  {
+    name: "Tarjeta de crédito",
+    active: 1,
+  },
+  {
+    name: "Transferencia",
+    active: 1,
+  },
+  {
+    name: "MercadoPago",
+    active: 1,
+  },
+];
 
 // Users
 const usersData = [
@@ -10,7 +36,7 @@ const usersData = [
     adress: "Olazabal 520",
     password: "5049378Bone",
     email: "manumorrison78@gmail.com",
-    rol_id: 1,
+    rol_id: 4,
   },
   {
     username: "america240690",
@@ -20,7 +46,7 @@ const usersData = [
     adress: "Juan B Justo 2653",
     password: "FranciA04270230",
     email: "benitezmartu24@gmail.com",
-    rol_id: 1,
+    rol_id: 4,
   },
   {
     username: "sabritole78",
@@ -30,7 +56,7 @@ const usersData = [
     adress: "Rivadavia 392",
     password: "28174938",
     email: "sabrit78@gmail.com",
-    rol_id: 1,
+    rol_id: 4,
   },
   {
     username: "javi1996",
@@ -40,7 +66,7 @@ const usersData = [
     adress: "Belgrano 1188",
     password: "40993782",
     email: "martinezjavii@gmail.com",
-    rol_id: 1,
+    rol_id: 4,
   },
   {
     username: "rociobodocco",
@@ -50,7 +76,7 @@ const usersData = [
     adress: "Maipu 201",
     password: "294789Holanda45",
     email: "rocio.bodocco@gmail.com",
-    rol_id: 2,
+    rol_id: 3,
   },
 ];
 
@@ -100,47 +126,82 @@ const productsData = [
   },
 ];
 
+
+const ordersHasProductsData = [
+  { quantity: 1, orders_id: 35, products_id: 5 },
+  { quantity: 2, orders_id: 35, products_id: 8 },
+  { quantity: 6, orders_id: 37, products_id: 6 },
+  { quantity: 4, orders_id: 38, products_id: 9 },
+];
+
 // orders
 const ordersData = [
   {
-    total_price: 10,
+    total_price: ordersHasProductsData.quantity*productsData.price,
     date: "2021-03-01 12:03:23",
     state: "nuevo",
-    payoptions_id: 1,
-    users_id: 62,
+    payoptions_id: 5,
+    users_id: 70,
   },
   {
-    total_price: 10,
+    total_price: ordersHasProductsData.quantity*productsData.price,
     date: "2021-04-01 12:03:23",
     state: "finalizado",
-    payoptions_id: 2,
-    users_id: 63,
+    payoptions_id: 6,
+    users_id: 72,
   },
   {
-    total_price: 10,
+    total_price: ordersHasProductsData.quantity*productsData.price,
     date: "2021-05-01 12:03:23",
     state: "confirmado",
-    payoptions_id: 3,
-    users_id: 63,
+    payoptions_id: 6,
+    users_id: 69,
   },
   {
-    total_price: 10,
+    total_price: ordersHasProductsData.quantity*productsData.price,
     date: "2021-05-01 12:03:23",
     state: "cancelado",
-    payoptions_id: 3,
-    users_id: 63,
+    payoptions_id: 4,
+    users_id: 73,
   },
 ];
 
-const ordersHasProductsData = [
-  { cuantity: 1, orders_id: 1, products_id: 1 },
-  { cuantity: 1, orders_id: 1, products_id: 2 },
-  { cuantity: 1, orders_id: 2, products_id: 2 },
-  { cuantity: 1, orders_id: 3, products_id: 3 },
-];
 
-orders
-  .findByPk(1, {
-    include: [{ model: products }, { model: users }],
-  })
-  .then((data) => console.log(data.products.map((p) => p.name)));
+//Send roleData data to db:
+// const data = roleData.map (async role =>  {
+//   const tempPed= await rol.create(role, { fields: ["name"] });
+// });
+
+//Send paymentOptionsData data to db:
+// const data = paymentOptionsData.map (async payop =>  {
+//   const tempPed= await payOptions.create(payop, { fields: ["name", "active"] });
+// });
+
+//Send usersData data to db:
+// const data = usersData.map (async user =>  {
+//   const tempPed= await users.create(user, { fields: ["username", "name", "lastname", "phone", "adress", "password", "email", "rol_id"] });
+// });
+
+//Send productsData data to db:
+// const data = productsData.map (async p =>  {
+//   const tempPed= await products.create(p, { fields: ["name", "price", "active", "image"] });
+// });
+
+// //Send ordersHasProductsData data to db:
+// const data = ordersHasProductsData.map (async ohasp =>  {
+//   const tempPed= await ordersHasProducts.create(ohasp, { fields: ["quantity", "orders_id", "products_id"] });
+// });
+
+//Send ordersData data to db:
+// const data = ordersData.map (async o =>  {
+//   const tempPed= await orders.create(o, { fields: ["total_price", "date", "state", "payoptions_id", "users_id"] });
+// });
+
+// console.log(data); 
+
+
+// orders
+//   .findByPk(1, {
+//     include: [{ model: products }, { model: users }],
+//   })
+//   .then((data) => console.log(data.products.map((p) => p.name)));
