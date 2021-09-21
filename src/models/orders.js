@@ -1,8 +1,8 @@
 const { DataTypes } = require ('sequelize');
-const sequelize = require ('../config/db');
+const {seq} = require ('./../config/db');
 
 
-const orders = sequelize.define('orders', {
+const orders = seq.define('orders', {
     total_price: {
         type: DataTypes.DECIMAL,
         allowNull:false

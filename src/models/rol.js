@@ -1,8 +1,8 @@
 const { DataTypes } = require ('sequelize');
-const sequelize = require ('./../config/db');
+const {seq} = require ('./../config/db');
 
 
-const rol = sequelize.define('rol', {
+const rol = seq.define('rol', {
     name: {
         type: DataTypes.STRING,
         allowNull:false

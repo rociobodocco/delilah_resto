@@ -1,9 +1,9 @@
 const { DataTypes } = require ('sequelize');
-const sequelize = require ('./../config/db');
+const {seq} = require ('./../config/db');
 const orders = require('./orders');
 const products = require('./products');
 
-const ordersHasProducts = sequelize.define('orders_has_products', {
+const ordersHasProducts = seq.define('orders_has_products', {
     quantity: { 
         type: DataTypes.INTEGER,
         allowNull:false
