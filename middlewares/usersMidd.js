@@ -1,28 +1,5 @@
 const { jwt, secretJwt } = require("../src/config/db.js");
 const { users } = require("../src/models");
-// function jwtMiddleware(req, res, next) {
-//   const headerAuth = req.headers["authorization"];
-//   if (!headerAuth) {
-//     return res.status("401").json({ message: "Token is missing!" });
-//   }
-//   const [, token] = headerAuth.split(" ");
-//   try {
-//     const tokenDecoded = jwt.verify(token, secretJwt);
-//     req.user = tokenDecoded.user;
-//   } catch (error) {
-//     let message;
-//     switch (error.name) {
-//       case "JsonWebTokenError":
-//         message = "Error in the JWT";
-//         break;
-//       default:
-//         message = "Error";
-//         break;
-//     }
-//     return res.status(401).json({ message });
-//   }
-//   return next();
-// };
 
 function validateAdmin(req, res, next) {
   const token = req.headers.authorization.split(" ")[1];
@@ -36,10 +13,10 @@ function validateAdmin(req, res, next) {
     if (verify.user.rol.id == 3) {
       next();
     } else {
-      res.status(401).json({ Error: "Token Invalido" });
+      res.status(401).json({ Error: "Token Invalido para esta consulta" });
     }
   }
-}
+};
 
 function validateDataUser(req, res, next) {
   const { username, name, lastname, email, password, phone, adress } = req.body;
@@ -59,11 +36,11 @@ function validateDataUser(req, res, next) {
   } else {
     next();
   }
-}
+};
 
 function validateUserExist(req, res, next) {
-  users.findByPk(req.params.id).then((user) => {
-    if (user.id > 0) {
+  users.findByPk(req.params.email).then((user) => {
+    if (user) {
       res
         .status(400)
         .json({ error: `El usuario ${req.body.username} ya existe` });
@@ -71,6 +48,6 @@ function validateUserExist(req, res, next) {
       next();
     }
   });
-}
+};
 
 module.exports = { validateAdmin, validateDataUser, validateUserExist };

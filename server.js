@@ -15,7 +15,7 @@ app.use(
     secret: secretJwt,
     algorithms: ["HS256"],
   }).unless({
-    path: [{ url: "/login", methods: ["POST"] }],
+    path: [{ url: "/login", methods: ["POST"] }, { url: "/register", methods: ["POST"] }],
   })
 );
 

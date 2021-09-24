@@ -4,12 +4,13 @@ const {
   validateUserExist,
 } = require("../middlewares/usersMidd.js");
 const { jwt, secretJwt } = require("../src/config/db.js");
+const { users, rol } = require("../src/models");
+// const bcrypt = require('bcrypt');
 
 module.exports = (app) => {
   // USERS ENDPOINTS
 
   //REGISTER:
-  //valid data and exist
   app.post(
     "/register",
     validateDataUser,
@@ -26,35 +27,33 @@ module.exports = (app) => {
         rol_id,
       } = req.body;
 
-      const newUser = users.build({
-        username,
-        name,
-        lastname,
-        phone,
-        adress,
-        password,
-        email,
-        rol_id,
+      const newUser = await users.create({
+        username: username,
+        name: name,
+        lastname: lastname,
+        phone: phone,
+        adress: adress,
+        password: password,
+        email: email,
+        rol_id: rol_id,
       });
 
-      res.status(201).json(
-        await newUser
-          .save()
-          .then((user) => {
-            let token = jwt.sign({ user: user }, secretJwt, {
-              expiresIn: "60m",
-            });
-            res.json({
-              user: user,
-              token: token,
-            });
-          })
-          .catch((e) => {
-            res.status(500).json(e);
-          })
-      );
+      newUser
+        .save()
+        .then((user) => {
+          let token = jwt.sign({ user: user }, secretJwt, {
+            expiresIn: "60m",
+          });
+          res.json({
+            user: user,
+            token: token,
+          });
+        })
+        .catch((e) => {
+          res.status(500).json(e);
+        });
     }
-  );
+  ); //ok 
 
   // LOGUIN:
   app.post("/login", async (req, res) => {
@@ -104,9 +103,9 @@ module.exports = (app) => {
 
   app.get("/users/:id", validateAdmin, async (req, res) => {
     try {
-      if (user) res.status(200).json(await users.findByPk(req.params.username));
+      if (users) res.status(200).json(await users.findByPk(req.params.id));
     } catch (e) {
       res.status(500).json({ error: e.message });
     }
   });
-};
+}; //ok
