@@ -1,6 +1,6 @@
 const express = require("express");
 const expressJwt = require("express-jwt");
-const { secretJwt } = require("./src/config/db.js");
+const { secretJwt } = require("./config/db");
 
 // PORT
 const APP_PORT = process.env.APP_PORT || 5000;
@@ -19,9 +19,9 @@ app.use(
   })
 );
 
-const usersRoutes = require("./routes/usersRoutes.js");
-const productsRoutes = require("./routes/productsRoutes.js");
-const ordersRoutes = require("./routes/ordersRoutes.js");
+const usersRoutes = require("./src/routes/usersRoutes");
+const productsRoutes = require("./src/routes/productsRoutes");
+const ordersRoutes = require("./src/routes/ordersRoutes");
 
 usersRoutes(app);
 productsRoutes(app);

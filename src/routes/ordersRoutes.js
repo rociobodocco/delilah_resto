@@ -1,12 +1,7 @@
-const {
-  orders,
-  users,
-} = require("../src/models");
-const {
-  validateDataOrder,
-} = require("../middlewares/ordersMidd.js");
-const { validateProductExist } = require("../middlewares/productsMidd.js");
-const { validateAdmin } = require("../middlewares/usersMidd.js");
+const { orders, users } = require("../models");
+const { validateDataOrder } = require("../controllers/ordersMidd");
+const { validateProductExist } = require("../controllers/productsMidd");
+const { validateAdmin } = require("../controllers/usersMidd");
 
 module.exports = (app) => {
   // ENDPOINTS ORDERS:
@@ -14,13 +9,15 @@ module.exports = (app) => {
     try {
       res.status(200).json(
         await orders.findAll({
-          include: [{ model: users }],
+          include: [
+            { model: users },
+          ],
         })
       );
     } catch (e) {
       res.status(500).json({ error: e.message });
     }
-  }); //ok
+  }); 
 
   app.get("/orders/:id", validateAdmin, async (req, res) => {
     try {
@@ -28,7 +25,7 @@ module.exports = (app) => {
     } catch (e) {
       res.status(500).json({ error: e.message });
     }
-  }); //ok
+  }); 
 
   app.post(
     "/orders",
@@ -51,7 +48,7 @@ module.exports = (app) => {
         res.status(400).json({ error: e.message });
       }
     }
-  ); //ok
+  ); 
 
   app.put("/orders/:id", validateAdmin, async (req, res) => {
     try {
@@ -72,7 +69,7 @@ module.exports = (app) => {
     } catch (e) {
       res.status(400).json({ message: `No se pudo actualizar la orden` });
     }
-  }); //ok
+  }); 
 
   app.delete("/orders/:id", validateAdmin, async (req, res) => {
     try {
@@ -88,5 +85,5 @@ module.exports = (app) => {
     } catch (e) {
       res.status(400).json({ message: `No se pudo eliminar la orden` });
     }
-  }); //ok
+  }); 
 };

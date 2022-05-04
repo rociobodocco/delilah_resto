@@ -2,10 +2,9 @@ const {
   validateAdmin,
   validateDataUser,
   validateUserExist,
-} = require("../middlewares/usersMidd.js");
-const { jwt, secretJwt } = require("../src/config/db.js");
-const { users, rol } = require("../src/models");
-// const bcrypt = require('bcrypt');
+} = require("../controllers/usersMidd");
+const { jwt, secretJwt } = require("../../config/db");
+const { users, rol } = require("../models");
 
 module.exports = (app) => {
   // USERS ENDPOINTS
@@ -53,7 +52,7 @@ module.exports = (app) => {
           res.status(500).json(e);
         });
     }
-  ); //ok 
+  );  
 
   // LOGUIN:
   app.post("/login", async (req, res) => {
@@ -82,7 +81,7 @@ module.exports = (app) => {
     );
 
     return res.json({ token });
-  }); //ok
+  }); 
 
   app.get("/users", validateAdmin, async (req, res) => {
     try {
@@ -99,7 +98,7 @@ module.exports = (app) => {
     } catch (error) {
       return next({ message: "Internal server error" });
     }
-  }); //ok
+  }); 
 
   app.get("/users/:id", validateAdmin, async (req, res) => {
     try {
@@ -108,4 +107,4 @@ module.exports = (app) => {
       res.status(500).json({ error: e.message });
     }
   });
-}; //ok
+}; 

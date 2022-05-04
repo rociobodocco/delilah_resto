@@ -1,5 +1,5 @@
 const { DataTypes } = require ('sequelize');
-const {seq} = require ('./../config/db');
+const {seq} = require ('../../config/db');
 
 
 const orders = seq.define('orders', {

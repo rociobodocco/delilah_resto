@@ -1,5 +1,5 @@
-const { jwt, secretJwt } = require("../src/config/db.js");
-const { users } = require("../src/models");
+const { jwt, secretJwt } = require("../../config/db");
+const { users } = require("../models");
 
 function validateAdmin(req, res, next) {
   const token = req.headers.authorization.split(" ")[1];

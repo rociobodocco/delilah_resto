@@ -1,12 +1,19 @@
-const { orders, products, users, ordersHasProducts, payOptions, rol } = require("./src/models");
+const {
+  orders,
+  products,
+  users,
+  ordersHasProducts,
+  payOptions,
+  rol,
+} = require("./src/models");
 
 // Roles
 const roleData = [
   {
-    name: "administrator"
+    name: "administrator",
   },
   {
-    name: "customer"
+    name: "customer",
   },
 ];
 
@@ -126,12 +133,11 @@ const productsData = [
   },
 ];
 
-
 const ordersHasProductsData = [
-  { quantity: 1, orders_id: 35, products_id: 5 },
-  { quantity: 2, orders_id: 35, products_id: 8 },
-  { quantity: 6, orders_id: 37, products_id: 6 },
-  { quantity: 4, orders_id: 38, products_id: 9 },
+  { quantity: 1, orders_id: 57, products_id: 5 },
+  { quantity: 2, orders_id: 57, products_id: 8 },
+  { quantity: 6, orders_id: 58, products_id: 6 },
+  { quantity: 4, orders_id: 59, products_id: 9 },
 ];
 
 // orders
@@ -187,21 +193,21 @@ const ordersData = [
 //   const tempPed= await products.create(p, { fields: ["name", "price", "active", "image"] });
 // });
 
-// //Send ordersHasProductsData data to db:
-// const data = ordersHasProductsData.map (async ohasp =>  {
+//Send ordersData data to db:
+// const data = ordersData.map(async (o) => {
+//   const tempPed = await orders
+//     .create(
+//       o,
+//       {
+//         fields: ["total_price", "date", "state", "payoptions_id", "users_id"],
+//       },
+//       {
+//         include: [{ model: products }, { model: users }],
+//       }
+//     )
+// });
+
+// // // //Send ordersHasProductsData data to db:
+// const data1 = ordersHasProductsData.map (async ohasp =>  {
 //   const tempPed= await ordersHasProducts.create(ohasp, { fields: ["quantity", "orders_id", "products_id"] });
 // });
-
-//Send ordersData data to db:
-// const data = ordersData.map (async o =>  {
-//   const tempPed= await orders.create(o, { fields: ["total_price", "date", "state", "payoptions_id", "users_id"] });
-// });
-
-// console.log(data); 
-
-
-// orders
-//   .findByPk(1, {
-//     include: [{ model: products }, { model: users }],
-//   })
-//   .then((data) => console.log(data.products.map((p) => p.name)));

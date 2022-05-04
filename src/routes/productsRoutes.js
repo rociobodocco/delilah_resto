@@ -1,9 +1,9 @@
 const {
   validateProductExist,
   validateDataProd,
-} = require("../middlewares/productsMidd.js");
-const { validateAdmin } = require("../middlewares/usersMidd.js");
-const { products } = require("../src/models");
+} = require("../controllers/productsMidd");
+const { validateAdmin } = require("../controllers/usersMidd");
+const { products } = require("../models");
 
 module.exports = (app) => {
   // ENDPOINTS PRODUCTS:
@@ -19,7 +19,7 @@ module.exports = (app) => {
     } catch (e) {
       res.status(500).json({ error: e.message });
     }
-  }); //ok
+  }); 
 
   app.get("/products/:id", async (req, res) => {
     try {
@@ -27,7 +27,7 @@ module.exports = (app) => {
     } catch (e) {
       res.status(500).json({ error: e.message });
     }
-  }); //ok
+  }); 
 
   app.post(
     "/products",
@@ -50,7 +50,7 @@ module.exports = (app) => {
         res.status(400).json({ error: e.message });
       }
     }
-  ); //ok
+  ); 
 
   app.put(
     "/products/:id",
@@ -72,7 +72,7 @@ module.exports = (app) => {
         res.status(400).json({ message: `No se pudo actualizar el producto` });
       }
     }
-  ); //ok
+  ); 
 
   app.delete(
     "/products/:id",
@@ -91,5 +91,5 @@ module.exports = (app) => {
       } catch (e) {
         res.status(400).json({ message: `No se pudo eliminar el producto` });
       }
-    }); //ok
+    }); 
 };

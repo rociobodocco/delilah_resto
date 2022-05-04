@@ -1,4 +1,4 @@
-const { products } = require("../src/models");
+const { products } = require("../models");
 
 function validateProductExist(req, res, next) {
   products.findByPk(req.params.id).then((prod) => {
