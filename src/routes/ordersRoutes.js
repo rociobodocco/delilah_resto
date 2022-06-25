@@ -5,7 +5,7 @@ const { validateAdmin } = require("../controllers/usersMidd");
 
 module.exports = (app) => {
   // ENDPOINTS ORDERS:
-  app.get("/orders", validateAdmin, async (req, res) => {
+  app.get("/v1/orders", validateAdmin, async (req, res) => {
     try {
       res.status(200).json(
         await orders.findAll({
@@ -19,7 +19,7 @@ module.exports = (app) => {
     }
   }); 
 
-  app.get("/orders/:id", validateAdmin, async (req, res) => {
+  app.get("/v1/orders/:id", validateAdmin, async (req, res) => {
     try {
       res.status(200).json(await orders.findByPk(req.params.id));
     } catch (e) {
@@ -28,7 +28,7 @@ module.exports = (app) => {
   }); 
 
   app.post(
-    "/orders",
+    "/v1/orders",
     validateProductExist,
     validateDataOrder,
     async (req, res) => {
@@ -50,7 +50,7 @@ module.exports = (app) => {
     }
   ); 
 
-  app.put("/orders/:id", validateAdmin, async (req, res) => {
+  app.put("/v1/orders/:id", validateAdmin, async (req, res) => {
     try {
       const id = req.params.id;
       const { total_price, date, state, users_id, payoptions_id } = req.body;
@@ -71,7 +71,7 @@ module.exports = (app) => {
     }
   }); 
 
-  app.delete("/orders/:id", validateAdmin, async (req, res) => {
+  app.delete("/v1/orders/:id", validateAdmin, async (req, res) => {
     try {
       const id = await req.params.id;
       console.log(id);

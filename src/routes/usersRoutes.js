@@ -11,7 +11,7 @@ module.exports = (app) => {
 
   //REGISTER:
   app.post(
-    "/register",
+    "/v1/register",
     validateDataUser,
     validateUserExist,
     async (req, res) => {
@@ -43,19 +43,20 @@ module.exports = (app) => {
           let token = jwt.sign({ user: user }, secretJwt, {
             expiresIn: "60m",
           });
-          res.json({
+          res.status(200).json({
             user: user,
             token: token,
+            message: "El usuario fue creado correctamente"
           });
         })
         .catch((e) => {
-          res.status(500).json(e);
+          res.status(500).json(e, {message: "Error al Crear Usuario"});
         });
     }
   );  
 
   // LOGUIN:
-  app.post("/login", async (req, res) => {
+  app.post("/v1/login", async (req, res) => {
     const { username, password } = req.body;
     const user = await users.findOne({
       attributes: ["id", "email", "name"],
@@ -80,10 +81,10 @@ module.exports = (app) => {
       { expiresIn: "60m" }
     );
 
-    return res.json({ token });
+    return res.status(200).json({ token });
   }); 
 
-  app.get("/users", validateAdmin, async (req, res) => {
+  app.get("/v1/users", validateAdmin, async (req, res) => {
     try {
       const usersData = await users.findAll({
         attributes: {
@@ -100,7 +101,7 @@ module.exports = (app) => {
     }
   }); 
 
-  app.get("/users/:id", validateAdmin, async (req, res) => {
+  app.get("/v1/users/:id", validateAdmin, async (req, res) => {
     try {
       if (users) res.status(200).json(await users.findByPk(req.params.id));
     } catch (e) {

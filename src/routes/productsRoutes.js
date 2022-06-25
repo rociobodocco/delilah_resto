@@ -7,7 +7,7 @@ const { products } = require("../models");
 
 module.exports = (app) => {
   // ENDPOINTS PRODUCTS:
-  app.get("/products", async (req, res) => {
+  app.get("/v1/products", async (req, res) => {
     try {
       res.status(200).json(
         await products.findAll({
@@ -21,7 +21,7 @@ module.exports = (app) => {
     }
   }); 
 
-  app.get("/products/:id", async (req, res) => {
+  app.get("/v1/products/:id", async (req, res) => {
     try {
       res.status(200).json(await products.findByPk(req.params.id));
     } catch (e) {
@@ -30,7 +30,7 @@ module.exports = (app) => {
   }); 
 
   app.post(
-    "/products",
+    "/v1/products",
     validateAdmin,
     validateDataProd,
     validateProductExist,
@@ -53,7 +53,7 @@ module.exports = (app) => {
   ); 
 
   app.put(
-    "/products/:id",
+    "/v1/products/:id",
     validateAdmin,
     async (req, res) => {
       // active: true
@@ -75,7 +75,7 @@ module.exports = (app) => {
   ); 
 
   app.delete(
-    "/products/:id",
+    "/v1/products/:id",
     validateAdmin,
     async (req, res) => {
       try {

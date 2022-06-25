@@ -1,0 +1,276 @@
+openapi: 3.0.1
+info:
+  title: Delilah Resto
+  description: 'Sistema de pedidos online para un restaurante.'
+  contact:
+    email: rocio.bodocco@gmail.com
+  version: 1.0.0
+servers:
+- url: https://localhost:3000/v1
+tags:
+  - name: Ingreso
+    description: Ingreso al Sitio
+  - name: Usuarios
+    description: Operaciones sobre Usuarios
+  - name: Productos
+    description: Operaciones sobre Productos
+  - name: Pedidos
+    description: Operaciones sobre Pedidos
+
+paths:
+  /register:
+    post:
+      tags:
+        - Usuarios
+      summary: Crear Usuario
+      description: Crear un usuario en la base de datos
+      operationId: crearUsuario
+      requestBody:
+        description: Usuario creado
+        content: {}
+        required: true
+      security: []
+      responses:
+        200:
+          description: Usuario Creado Correctamente
+        400:
+          description: El Usuario ya existe en la base de Datos
+        500:
+          description : Error al Crear Usuario
+
+  /users:
+    get:
+      tags:
+        - Usuarios
+      summary: Muestra el listado de Usuarios
+      description: Muestra el listado de USuarios, se debe enviar Token
+      operationId: userData
+      responses:
+        200:
+          description: Operacion Correcta
+        401:
+         description: Token Invalido
+        500:
+          description : Error
+          
+  /users/:id:
+    get:
+      tags:
+        - Usuarios
+      summary: Muestra un usuario buscado por id
+      description: Muestra solo un usuario buscado por id, se debe enviar Token
+      operationId: user
+      responses:
+        200:
+          description: Operacion Correcta
+        401:
+         description: Token Invalido para esta consulta
+        500:
+          description : Error
+
+    
+  /login:
+    get:
+      tags:
+        - Ingreso
+      security: []
+      summary: Ingreso al Sistema
+      operationId: loginUsuario
+      parameters:
+        - name: username
+          in: query
+          description: Nombre de usuario para acceso al sistema
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: Contraseña para acceso al sistema 
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Login (Token generado)
+        401:
+          description: Usuario y/o contraña incorrecto
+        500:
+          description : Error
+        
+        
+  /products:
+    get:
+      tags:
+        - Productos
+      summary: Trae el Listado de Productos
+      description: Muestra todos los productos
+      operationId: getProducts
+      parameters:
+        - name: busqueda
+          in: query
+          description: Busqueda por id
+          schema:
+            type: string
+      responses:
+        200:
+          description: Operacion Correcta
+        404:
+         description: Producto no encontrado
+        500:
+         description : Error
+    
+
+    post:
+      tags:
+        - Productos
+      summary: Agrega Producto
+      description: Agrega producto al sistema
+      operationId: addProduct
+      requestBody:
+        description: Agregar nuevo producto a la base de datos
+        content: {}
+        required: true
+      responses:
+        200:
+          description: Productos Agregado Correctamente
+        400:
+          description: Error al agregar Producto
+        401:
+          description: Token Invalido
+        500:
+          description : Error
+    put:
+      tags:
+        - Productos
+      summary: Editar un producto
+      description: Edita las especificaciones de un producto
+      parameters:
+        - name: id
+          in: query
+          description: El Id del producto
+          required: true
+          schema:
+            type: string
+      operationId: editProduct
+      requestBody:
+        description: Agregar nuevo producto a la base de datos
+        content: {}
+        required: true
+      responses:
+        200:
+          description: "Producto modificado Correctamente"
+        400:
+          description: Error al editar producto
+        401:
+          description: Token Invalido
+        500:
+          description : Error
+    delete:
+      tags:
+        - Productos
+      summary: Elimina un producto
+      description: Elimina un prodcto mediante el ID
+      parameters:
+        - name: id
+          in : query
+          description: El Id del producto es necesario para eliminarlo
+          required: true
+          schema:
+            type: string
+      operationId: deletePorduct
+      responses:
+        200:
+          description: "Producto eliminado Correctamente"
+        400:
+          description: Error al eliminar producto
+        401:
+           description: Token Invalido
+        500:
+          description : Error
+
+  /orders:
+    get:
+      tags:
+        - Pedidos
+      summary: Trae listado de Pedidos
+      description: Trae el listado de todos los Pedidos
+      operationId: getOrders
+      responses:
+        200:
+          description: "Operacion Correcta"
+        400:
+          description: "La Operacion no existe"
+        401:
+           description: Token Invalido
+        500:
+          description : Error
+
+    post:
+      tags:
+        - Pedidos
+      summary: Crear un Pedido
+      description: Agrega una nuevo Pedido a la base de datos
+      operationId: addOrder
+      requestBody:
+        description: Crear Pedido
+        content: {}
+        required: true
+      responses:
+        200:
+          description: "Pedido Creado Correctamente"
+        400:
+          description: "Error al crear Pedido"
+        401:
+           description: Token Invalido
+        500:
+          description : Error
+    put:
+      tags:
+        - Pedidos
+      summary: Editar un Pedido
+      description: Edita un Pedido
+      operationId: editOrder
+      parameters:
+        - name: id
+          in: query
+          description: El Id del Pedido a Editar
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Editar un pedido buscado por id
+        content: {}
+        required: true
+      responses:
+        200:
+          description: "Pedido Editado Correctamente"
+        400:
+          description: "Error al editar Pedido"
+        401:
+           description: Token Invalido
+        500:
+          description : Error
+    delete:
+      tags:
+        - Pedidos
+      summary: Eliminar un Pedido
+      description: Eliminar un Pedido
+      operationId: deleteOrder
+      parameters:
+        - name: id
+          in: query
+          description: El Id del pedido a Eliminar
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Pedido Eliminado Correctamente"
+        400:
+          description: "Error al eliminar el Pedido"
+        401:
+           description: Token Invalido
+        500:
+          description : Error
+security:
+  - bearerAuth: []
